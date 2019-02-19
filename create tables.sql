@@ -26,8 +26,28 @@ CREATE TABLE IF NOT EXISTS device (
 
 CREATE TABLE IF NOT EXISTS api_key (
     key VARCHAR(32) PRIMARY KEY,
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     account INTEGER REFERENCES account ON DELETE CASCADE,
     device INTEGER REFERENCES device ON DELETE CASCADE,
     CHECK ((account IS NULL) != (device IS NULL))
+);
+
+CREATE TABLE IF NOT EXISTS alarm_clock (
+    id SERIAL PRIMARY KEY,
+    home INTEGER REFERENCES home ON DELETE CASCADE NOT NULL,
+    name VARCHAR(100) NULL,
+    enable_at TIMESTAMP WITH TIME ZONE NULL,
+    UNIQUE(home, name)
+);
+
+CREATE TABLE IF NOT EXISTS alarm_clock_time (
+    id SERIAL PRIMARY KEY,
+    alarm_clock INTEGER REFERENCES alarm_clock NOT NULL,
+    work_day_only BOOLEAN NOT NULL,
+    non_work_day_only BOOLEAN NOT NULL,
+    alarm_clock_time TIME NOT NULL,
+    is_default BOOLEAN NOT NULL, -- Otherwise temporary
+    valid_from TIMESTAMP WITH TIME ZONE NOT NULL,
+    valid_to TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_by INTEGER REFERENCES account NOT NULL
 );
