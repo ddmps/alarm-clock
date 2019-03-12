@@ -39,7 +39,7 @@ async function authenticateKey(apiKey) {
 async function authenticateHuman(user) {
     const human = await getHumanPasswordData(user.email);
     if (human) {
-        if (argon.verify(human.hash, human.salt + user.password)) {
+        if (argon.verify(human.hash, user.password)) {
             return human.accountId;
         } else {
             console.info('Could not authenticate human with id', human.accountId);
@@ -66,7 +66,6 @@ async function getHumanPasswordData(email) {
     const query = await client.query(`SELECT * FROM human WHERE email = $1`, [email]);
     return query.rows.length === 1 && {
         accountId: query.rows[0].id,
-        salt: query.rows[0].password_salt,
         hash: query.rows[0].password_hash
     };
 }

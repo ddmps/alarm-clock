@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS account (
 CREATE TABLE IF NOT EXISTS human (
     name VARCHAR(100) NULL,
     email VARCHAR(200) UNIQUE NOT NULL,
-    password_salt CHAR(16) NOT NULL,
     password_hash BYTEA NOT NULL
 ) INHERITS (account);
 
