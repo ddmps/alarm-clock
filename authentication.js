@@ -54,8 +54,7 @@ async function makeAccountObject(account) {
     const client = new Client();
     await client.connect();
     const homesQuery = await client.query(
-        `SELECT aih.home as homeId, ISNULL(ad.home) as isAdmin FROM account_in_home aih
-                LEFT JOIN admin ad ON ad.account = aih.account AND ad.home = aih.home
+        `SELECT aih.home as homeId, aih.admin as isAdmin FROM account_in_home aih
                 WHERE aih.account = $1`, [account]);
     return {id: account, accessToHomes: homesQuery.rows};
 }
