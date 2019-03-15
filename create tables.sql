@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS account_in_home (
 CREATE TABLE IF NOT EXISTS device (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    home INTEGER REFERENCES home ON DELETE CASCADE NOT NULL,
     UNIQUE(name, home)
 ) INHERITS (account);
 
