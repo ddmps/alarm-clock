@@ -1,0 +1,9 @@
+{
+  "port": 3001,
+  "postgres": {
+    "database_name": "home",
+    "database_user": "homewebapi",
+    "database_pass": "your password"
+  },
+  "arbetsdag-api-key": "your api key"
+}
