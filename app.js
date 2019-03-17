@@ -20,8 +20,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/alarms', authentication);
-app.use('/alarms', alarmsRouter);
+app.use('/homes/:homeId/alarmClocks/:alarmId', authentication);
+app.use('/homes/:homeId/alarmClocks/:alarmId', alarmsRouter);
+
+app.use('/alarmClocks', authentication);
+app.use('/alarmClocks', alarmsRouter);
 
 app.use('/users', usersRouter);
 

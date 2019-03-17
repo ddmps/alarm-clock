@@ -4,7 +4,7 @@ const {Client} = require('pg');
 var workDay = require('../workDayService');
 
 // Make sure the account has access to the alarm
-router.use('/alarm/:alarmId', async function (req, res, next) {
+router.use('/:alarmId', async function (req, res, next) {
     if (res.locals.account && res.locals.account.accessToHomes) {
         if (!/\d+/.test(req.params.alarmId)) {
             res.status(400).send({error: 'alarmId in url /alarm/alarmId/* must be an integer'});
@@ -26,7 +26,7 @@ router.use('/alarm/:alarmId', async function (req, res, next) {
     }
 });
 
-router.get('/alarm/:alarmId/alarmClockTime', async function (req, res, next) {
+router.get('/:alarmId/alarmClockTime', async function (req, res, next) {
     const client = new Client();
     await client.connect();
     client.query(`SELECT t.* current_time + MOD(EXTRACT(EPOCH FROM t.alarm_clock_time - current_time), 60*60*24) * interval '1 second' as next_time, 
@@ -53,7 +53,7 @@ router.get('/alarm/:alarmId/alarmClockTime', async function (req, res, next) {
         });
 });
 
-router.post('/alarm/:alarmId/alarmClockTime/', async function (req, res, next) {
+router.post('/:alarmId/alarmClockTime/', async function (req, res, next) {
     if (req.body && req.body.alarmClockTime && req.body.isDefault) {
         if (!/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(req.body.alarmClockTime)) {
             res.status(400).send({error: "supplied alarmClockTime is not in correct form (H)H:MM"});
