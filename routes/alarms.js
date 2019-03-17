@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const {Client} = require('pg');
+const query = require('../database.js');
 var workDay = require('../workDayService');
 
 // Make sure the account has access to the alarm
@@ -10,9 +10,7 @@ router.use('/:alarmId', async function (req, res, next) {
             res.status(400).send({error: 'alarmId in url /alarm/alarmId/* must be an integer'});
             return;
         }
-        const client = new Client();
-        await client.connect();
-        client.query(`SELECT 1 FROM alarm_clock a 
+        query(`SELECT 1 FROM alarm_clock a 
                      INNER JOIN home h ON a.home = h.id
                      WHERE a.id = $1 AND h.id ANY($2)`,
             [req.params.alarmId, res.locals.account.accessToHomes])
@@ -27,9 +25,7 @@ router.use('/:alarmId', async function (req, res, next) {
 });
 
 router.get('/:alarmId/alarmClockTime', async function (req, res, next) {
-    const client = new Client();
-    await client.connect();
-    client.query(`SELECT t.* current_time + MOD(EXTRACT(EPOCH FROM t.alarm_clock_time - current_time), 60*60*24) * interval '1 second' as next_time, 
+    query(`SELECT t.* current_time + MOD(EXTRACT(EPOCH FROM t.alarm_clock_time - current_time), 60*60*24) * interval '1 second' as next_time, 
                  FROM alarm_clock_time t 
                  INNER JOIN alarm_clock a ON a.id = t.alarm 
                  WHERE a.id = $1  
@@ -70,9 +66,7 @@ router.post('/:alarmId/alarmClockTime/', async function (req, res, next) {
 
         const validFrom = req.body.validDays ? new Date() : null;
         const validTo = req.body.validDays ? `${new Date()} ${req.body.validDays} * interval '1 day'` : null;
-        const client = new Client();
-        await client.connect();
-        client.query(
+        query(
             `INSERT INTO alarm_clock_time
             (alarm_clock, work_day_only, non_work_day_only, alarm_clock_time, is_default, valid_from, valid_to, created_by) 
             VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,

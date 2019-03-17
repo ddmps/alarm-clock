@@ -1,14 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var argon = require('argon2');
-const {Client} = require('pg');
+const query = require('../database');
 
-router.post('/', async function (req, res, next) {
+router.post('/', async function (req, res) {
     if (req.body && req.body.user && req.body.user.email && req.body.user.password) {
         argon.hash(req.body.user.password).then(async hash => {
-            const client = new Client();
-            await client.connect();
-            client.query(
+            query(
                 `INSERT INTO human
             (name, email, password_hash) 
             VALUES($1, $2, $3)`, [req.body.user.name, req.body.user.email, hash])
@@ -19,7 +17,6 @@ router.post('/', async function (req, res, next) {
                         return;
                     }
                     res.sendStatus(200);
-                    next();
                 })
                 .catch(e => {
                     console.error('error while inserting human', e);

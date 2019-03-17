@@ -1,4 +1,4 @@
-const {Client} = require('pg');
+const query = require('./database');
 const argon = require('argon2');
 
 async function authenticate(req, res, next) {
@@ -30,10 +30,8 @@ async function authenticate(req, res, next) {
 }
 
 async function authenticateKey(apiKey) {
-    const client = new Client();
-    await client.connect();
-    const query = await client.query(`SELECT * FROM api_key WHERE key = $1`, [apiKey]);
-    return query.rows.length === 1 && query.rows[0].account;
+    const res = await query(`SELECT * FROM api_key WHERE key = $1`, [apiKey]);
+    return res.rows.length === 1 && res.rows[0].account;
 }
 
 async function authenticateHuman(user) {
@@ -51,21 +49,17 @@ async function authenticateHuman(user) {
 }
 
 async function makeAccountObject(account) {
-    const client = new Client();
-    await client.connect();
-    const homesQuery = await client.query(
+    const homesQuery = await query(
         `SELECT aih.home as homeId, aih.admin as isAdmin FROM account_in_home aih
                 WHERE aih.account = $1`, [account]);
     return {id: account, accessToHomes: homesQuery.rows};
 }
 
 async function getHumanPasswordData(email) {
-    const client = new Client();
-    await client.connect();
-    const query = await client.query(`SELECT * FROM human WHERE email = $1`, [email]);
-    return query.rows.length === 1 && {
-        accountId: query.rows[0].id,
-        hash: query.rows[0].password_hash
+    const res = await query(`SELECT * FROM human WHERE email = $1`, [email]);
+    return res.rows.length === 1 && {
+        accountId: res.rows[0].id,
+        hash: res.rows[0].password_hash
     };
 }
 

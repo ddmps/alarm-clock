@@ -1,14 +1,12 @@
 var express = require('express');
 var router = express.Router();
-const {Client} = require('pg');
 var crypto = require("crypto");
+const query = require('../database.js');
 
 router.post('/', async function (req, res) {
         if (req.body && req.body.home && req.body.home.name) {
             if (typeof req.body.home.name === 'string' && req.body.home.name.length <= 100) {
-                const client = new Client();
-                await client.connect();
-                client.query(
+                query(
                     `WITH new_home as (
                         INSERT INTO home(name) VALUES($1)
                         RETURNING id
@@ -42,9 +40,7 @@ router.post('/:homeId/device', ensureAdmin, async function (req, res) {
         if (req.body.device.createAPIKey) {
             apiKey = crypto.randomBytes(16).toString('hex');
         }
-        const client = new Client();
-        await client.connect();
-        client.query(
+        query(
             `
             WITH new_device as (INSERT INTO device(name) VALUES ($1) RETURNING id)
             INSERT INTO account_in_home(account, home) VALUES ((SELECT id FROM new_device), $2);
@@ -71,9 +67,7 @@ router.post('/:homeId/device', ensureAdmin, async function (req, res) {
 
 router.post('/:homeId/alarmClock', ensureAdmin, async function (req, res) {
     const name = null || req.body && req.body.alarmClock && req.body.alarmClock.name;
-    const client = new Client();
-    await client.connect();
-    client.query(`INSERT INTO alarm_clock (home, name) VALUES ($1, $2) RETURNING id`, [req.params.homeId, name])
+    query(`INSERT INTO alarm_clock (home, name) VALUES ($1, $2) RETURNING id`, [req.params.homeId, name])
         .then(alarmCreation => {
             if (alarmCreation.rowsAffected === 1) {
                 res.send({alarmClock: {id: alarmCreation.rows[0].id, name: name}});
