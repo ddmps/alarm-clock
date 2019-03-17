@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var argon = require('argon2');
-const query = require('../database');
+const query = require('../database').query;
 
 router.post('/', async function (req, res) {
     if (req.body && req.body.user && req.body.user.email && req.body.user.password) {

@@ -1,4 +1,4 @@
-const query = require('./database');
+const query = require('./database').query;
 const argon = require('argon2');
 
 async function authenticate(req, res, next) {

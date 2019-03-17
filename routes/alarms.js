@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const query = require('../database.js');
+const query = require('../database.js').query;
 var workDay = require('../workDayService');
 
 // Make sure the account has access to the alarm
