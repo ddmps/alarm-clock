@@ -15,7 +15,7 @@ router.use('/alarm/:alarmId', async function (req, res, next) {
         client.query(`SELECT 1 FROM alarm_clock a 
                      INNER JOIN home h ON a.home = h.id
                      WHERE a.id = $1 AND h.id ANY($2)`,
-            [req.params.alarmId, res.locals.accessToHomes])
+            [req.params.alarmId, res.locals.account.accessToHomes])
             .then(res => {
                 if (res.rows[0]) next();
                 else res.sendStatus(404);
